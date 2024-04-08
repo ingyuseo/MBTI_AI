@@ -1,0 +1,288 @@
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap');
+
+
+.App {
+  text-align: center;
+  height: 100%;
+  padding: 0px;
+  margin: 0 auto;
+  font-family:'Nanum Gothic';
+  font-weight: 1000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-image: url('../public/img/bg_img.png');
+  width:600px;
+}
+
+.main-form{
+  padding-top: 60px;
+  margin: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 600px;
+  min-height: calc(100% - 120px);
+  background-color: rgb(250, 253, 255);
+  border: 2px black;
+  border-radius: 15px; 
+  opacity: 0.9;
+}
+
+.second-form{
+  margin: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 660px;
+  min-height: 660px;
+  background-color: rgb(250, 253, 255);
+  border: 2px black;
+  border-radius: 15px; 
+  opacity: 0.9;
+}
+
+.third-form{
+  margin: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 660px;
+  min-height: 660px;
+  background-color: rgb(250, 253, 255);
+  border: 2px black;
+  border-radius: 15px; 
+  opacity: 0.9;
+}
+
+.mbti_img{
+  width:30px;
+  height: auto;
+}
+
+.albumArt{
+  width: 180px;
+  height: auto;
+  border-radius: 10px;
+  margin-top: 20px;
+  margin-left: 20px;
+}
+
+.heart{
+  margin-top: 60px;
+  width: 90px;
+  height: 90px;
+  padding-right: 20px;
+}
+
+.result{
+  margin-top: 40px;
+  display: flex;
+}
+
+.main-form > * {
+  margin: 0 auto;
+}
+
+.main-choice{
+  display: flex;
+  margin-bottom:60px;
+  padding:40px;
+  justify-content: space-evenly;
+  gap: 20px;
+  background-color: rgb(237, 234, 231);
+  border-radius: 15px;
+  background-image: linear-gradient(to right, #ebb3ec81, #e2e0df);
+  box-shadow: 5px 5px 10px rgba(0,0,0,0.5);
+  
+}
+
+.main-choice:hover {
+  transform: scale(1.03); 
+}
+
+.main-choice img{
+  width: 120px;
+}
+
+.center-text{
+  width: 250px;
+  display: flex;
+  align-items: center;
+  font-size: 30px;
+  font-weight:800;
+  letter-spacing: 1px;
+}
+
+.backBtn{
+  background-image: url('../public/img/back_btn.png');
+  margin-left: 510px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  width: 30px;
+  height: 46px;
+  background-repeat:no-repeat;
+  background-size: 30px 30px;
+  border: 5px black;
+}
+
+.backBtn2{
+  background-image: url('../public/img/back_btn.png');
+  margin-left: 510px;
+  margin-top: 10px;
+  height: 30px;
+  background-repeat:no-repeat;
+  background-size: 30px 30px;
+  border: 5px black;
+}
+
+::-webkit-scrollbar-track {
+  background: #ece7e7; /* 트랙의 배경색 */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #b3b3b3; /* 스크롤 바의 썸(움직이는 부분) 배경 색상 */
+}
+
+.backBtn:hover {
+  transform: scale(1.04); 
+}
+
+.list-wrapper{
+  padding-left: 25px;
+  display: grid;
+  grid-template-columns: repeat(4, 120px); /* 4개의 열 생성 */
+  grid-template-rows: repeat(4, 1fr); /* 4개의 행 생성 */
+  gap: 10px; /* 그리드 아이템 사이의 간격 */
+  row-gap: 15px;
+  overflow: auto;
+}
+
+::-webkit-scrollbar {
+  width: 5px; /* 스크롤바의 너비 */
+}
+
+.mbti-wrapper{
+  display: flex;
+  flex-direction: column;
+  border: 2px black;
+  border-radius: 10px;
+  box-shadow: 1px 2px 2px 1px rgba(0,0,0,0.2);
+}
+
+.mbti_img{
+  width:200px;
+}
+
+.search {
+  padding-left: 30px;
+  position: relative;
+  width: 500px;
+}
+
+
+input {
+  padding-right: 200px;
+  width: 470px;
+  border: 1px solid #bbb;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+}
+
+.searchBtn {
+  position : absolute;
+  width: 17px;
+  top: 10px;
+  right: 30px;
+  margin: 0;
+}
+
+
+.robot2{
+  width: 70px;
+  margin-left: 30px;
+}
+
+.speech-bubble {
+	position: relative;
+	background: #ebdbe3;
+	border-radius: .4em;
+  width: 380px;
+  margin-left: 40px;
+  box-shadow: 2px 2px 2px 1px rgba(0,0,0,0.2);
+}
+
+.speech-bubble:after {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 50%;
+	width: 0;
+	height: 0;
+	border: 18px solid transparent;
+	border-right-color: #ebdbe3;
+	border-left: 0;
+	margin-top: -18px;
+	margin-left: -18px;
+}
+
+.robot-wrapper{
+  display: flex;
+  margin-top: 40px;
+  margin-bottom: 20px;
+  height: 100px;
+}
+
+.search-result{
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  max-height: 400px;
+}
+
+.songlist{
+  display: flex;
+  border: 2px black;
+  border-radius: 10px;
+  box-shadow: 2px 2px 2px 1px rgba(0,0,0,0.2);
+}
+
+.songlist:hover {
+  transform: scale(1.04); 
+}
+
+
+.songinfo{
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+}
+
+.songinfo p{
+  padding-left: 20px;
+  margin-bottom: 10px;
+}
+
+.singer{
+  color: rgb(52, 56, 53)
+}
+
+.AlbumArt{
+  width:90px;
+  height:90px;
+  padding-left:10px;
+}
+
+
+
+.remain-img{
+  width:100px;
+  padding-right: 10px;
+}
+
+.row-container{
+  border-radius: 10px;
+  box-shadow: 2px 2px 2px 1px rgba(0,0,0,0.2);
+  margin-top: 30px;
+  display: flex;
+  overflow-x: auto;
+}

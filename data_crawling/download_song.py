@@ -36,9 +36,19 @@ driver.maximize_window()
 
 song_list = pd.read_csv("mbti_data.csv")
 
-todo = 441
+todo = 0
 
 for index, row in enumerate(song_list.iloc[todo:].itertuples(index=False), start=todo):
+    
+    new_file_name = f'{row.song}_{row.singer}.mp3'
+    invalid_chars = re.compile(r'[\\/:"*?<>|]+')
+    new_file_name = re.sub(invalid_chars, '', new_file_name)
+    new_file_path = os.path.join(download_directory,  row.mbti ,new_file_name)
+    
+    
+    if os.path.exists(new_file_path):
+        continue
+    
     print(f'{index}, {row.song} - {row.singer}  ({row.mbti})')
     
     search_query = quote(f"{row.song} {row.singer}")
@@ -63,7 +73,7 @@ for index, row in enumerate(song_list.iloc[todo:].itertuples(index=False), start
                     EC.presence_of_element_located((By.CSS_SELECTOR, ".btn a"))
             )
             btn.click() #이 버튼 클릭시 다운로드
-            time.sleep(3)
+            time.sleep(1)
             break
         except Exception as ex:
             time.sleep(60)
@@ -80,10 +90,6 @@ for index, row in enumerate(song_list.iloc[todo:].itertuples(index=False), start
         downloaded_file = files[0]
         
         if downloaded_file.endswith('.mp3'):
-            new_file_name = f'{row.song}_{row.singer}.mp3'
-            invalid_chars = re.compile(r'[\\/:"*?<>|]+')
-            new_file_name = re.sub(invalid_chars, '', new_file_name)
-            new_file_path = os.path.join(download_directory,  row.mbti ,new_file_name)
             old_file_path = os.path.join(download_directory, downloaded_file) 
             shutil.move(old_file_path, new_file_path)
             break 

@@ -1,0 +1,43 @@
+.header{
+    display: flex;
+    width: 550px;
+    justify-content: center;
+    top:0;
+    margin: 0 auto;
+}
+
+.img_wrapper{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    margin-right: 60px;
+}
+
+.head_img{
+    margin-left: 80px;
+    height: 70px;
+    width: 400px;
+    margin-top: 20px;
+}
+
+.head_img2{
+    height: 80px;
+    width: 530px;
+    margin-top: 20px;
+}
+
+.login_img{
+    height: 40px;
+    
+}
+
+.main_title{
+    padding-left:20px;
+    font-family:'Nanum Gothic';
+}
+
+.login_img, .bar{
+    padding-top: 20px;
+    padding-left: 80px;
+}
+

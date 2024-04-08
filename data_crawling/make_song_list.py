@@ -14,17 +14,24 @@ import pandas as pd
 import random
 from typing import Dict
 import re
+import sys
 
 
 def make_song_list(driver, mbti, count, num_per_person, data_list):
     start = 1
-    if mbti == "ENFP" or mbti == "INTP" : # skip the first INTP, ENFP playlist (bad data)
+    if mbti == "ENFP" or mbti == "INTP" :# skip the first INTP, ENFP playlist (bad data)
         start +=1
         count +=1
+
+    if mbti == "ISFP": 
+        count += 1
     
     for i in range(start,count+1):
         driver.get(f'https://open.spotify.com/search/{mbti}/playlists')
         driver.implicitly_wait(5)
+        
+        if mbti == "ISFP" and i == 11:
+            continue
         
         xpath = f'//*[@id="searchPage"]/div/div/div/div[1]/div[{i}]'
         playlist_box = driver.find_element(By.XPATH, xpath)
@@ -41,6 +48,8 @@ def make_song_list(driver, mbti, count, num_per_person, data_list):
             
         total_song_num = int(re.findall(r'\d+', element.text.replace(',',''))[0])
         n = total_song_num
+        
+        print(total_song_num)
 
         # Pick random number
         numbers_list = list(range(1, n + 1))
@@ -58,38 +67,45 @@ def make_song_list(driver, mbti, count, num_per_person, data_list):
             height = (total_height*num)//total_song_num
             try:                     
                 driver.execute_script(f"arguments[0].scrollTo(0, {height})", itemlist)
-                elem = WebDriverWait(driver, SCROLL_PAUSE_SEC).until(
+                row = WebDriverWait(driver, SCROLL_PAUSE_SEC).until(
                     EC.presence_of_element_located((By.XPATH, f"//div[@aria-rowindex={num+1}]"))
                 )
-                lines = elem.text.split('\n')
-                print(num , lines[1], lines[2])
-                new_row = {'mbti': mbti, 'song': lines[1], 'singer': lines[2]}
-                data_list.loc[len(data_list)] = new_row
+                elem =row.find_element(By.XPATH, ".//div[@aria-colindex='2']")
+                lines = elem.text.split('\n')  
+                print(f'{num} song: {lines[0]}, singer:{lines[1]}')
+                new_row = {'mbti': mbti, 'song': lines[0], 'singer': lines[1]}
+                new_data = pd.DataFrame([new_row])
+                data_list = pd.concat([data_list, new_data], ignore_index=False)
                 
             except Exception as ex:
-                print('!!!!!!!Can not find song element!!!!!!!!!', num)
-                return False
-            
-    return True
+                print(ex)
+                print(num)
+                sys.exit() 
+         
+    return data_list
                 
 
 if __name__ == '__main__':
-    
-    driver = webdriver.Chrome() 
+
+# WebDriver 생성
+    driver = webdriver.Chrome()
     driver.maximize_window()
     
-    mbti_list = ["ISFJ", "INTP", "INFJ", "INTJ", "ISTP", "ISFP", "INFP","ESTP", "ESFP", "ENFP", "ENTP", "ESTJ", "ESFJ", "ENFJ", "ENTJ"]
-    #except ISTJ, because there is a album named ISTJ. NCT DREAM.. 
-    #ENFP also NCT DREAm..
+    mbti_list = ["ESFP"]
+
+#done INTP ISTP "ISFP ISFJ INFJ "INTJ",  "ENFP", "ENTP", 
+#todo   "ESTJ", "ESFJ", "ENFJ","ISTJ","ENTJ", "INFP","ESTP", "ESFP", 
+  
     
     num_people = 25
-    song_per_person = 5
-    mbti_song_data = pd.DataFrame(columns=['mbti', 'song', 'singer'])
+    song_per_person = 4
+    
+    mbti_song_data = pd.read_csv('mbti_data.csv')
+    #mbti_song_data = pd.DataFrame(columns=['mbti', 'song', 'singer'])
     
     for mbti in mbti_list:
-        if make_song_list(driver, mbti, num_people, song_per_person, mbti_song_data) == False:
-            break
-        mbti_song_data.to_csv('mbti_data.csv', index=True)
-        
-    print('done!')
+        mbti_song_data = make_song_list(driver, mbti, num_people, song_per_person, mbti_song_data)
+        print(mbti_song_data.shape[0])
+        mbti_song_data.to_csv('mbti_data.csv', index=False)
+
         
