@@ -31,6 +31,9 @@ function App() {
   else if(mode === "SCORE"){
     content = <ShowScore setMode={setMode} singer={singer} song={song} albumArt={albumArt}> </ShowScore>;
   }
+  else if(mode === "Show_playlist"){
+    content = <MbtiTopList setMode={setMode} mbti={mbti}></MbtiTopList>
+  }
   
 
   return (
@@ -57,9 +60,9 @@ function ShowMbtiList(props) {
         {mbti_list.map((mbti, index) => (
           <div key={index} className='mbti-wrapper' onClick={() => {
             props.setMbti(mbti);
-            props.setMode("show_playlist");
+            props.setMode("Show_playlist");
           }}>
-            <img className='mbti-img' src={`img/${mbti}.png`} alt={mbti} />
+            <img src={`img/${mbti}.png`} alt={mbti} />
             <span>{mbti}</span>
           </div>
         ))}
@@ -67,6 +70,48 @@ function ShowMbtiList(props) {
     </div>
   );
 }
+
+function MbtiTopList(props){
+  const [ResultList, setSongs] = useState([]); // 검색 결과를 저장할 상태
+    useEffect(() => {
+      const fetchSongs = async () => {
+        try {
+          const response = await axios.get(`http://localhost:8000/songs/${props.mbti}`);
+          setSongs(response.data);
+        } catch (error) {
+          console.error("Error fetching songs:", error);
+        }
+      };
+  
+      fetchSongs();
+    }, [props.mbti]);
+
+    return (
+      <div className='third-form'>
+        <div className='backBtn' onClick={() => props.setMode("SHOW_LIST")}></div>
+        <div className='wrapper'>
+          <h2>= {props.mbti}를 위한 추천 곡들 =</h2>
+          <img className='mbti_img' src={`img/${props.mbti}.png`} alt={props.mbti} />
+        </div>
+        
+        <div className='search-result'>
+          {ResultList.map((item, index) => (
+            <div className="songlist" key={index} >
+              <img className='AlbumArt'src={item.img_src}></img>
+              <div className='songinfo'>
+                <p className='songname'>{item.song_title}</p>
+                <p className='singer'>{item.artist}</p>
+              </div>
+              <div className='score'>
+                <h3>{Math.round(item.score * 100)}점</h3>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+}
+
 
 function ShowScore(props){
   const [recommendations, setRecommendations] = useState({});
@@ -76,7 +121,7 @@ function ShowScore(props){
     setIsLoading(true);
     const fetchData = async () => {
     try {
-      const response = await axios.post('http://localhost:8000/recommend/', new URLSearchParams({ song_name: props.song, singer: props.singer }), {
+      const response = await axios.post('http://localhost:8000/recommend/', new URLSearchParams({ song_name: props.song, singer: props.singer, img_src: props.albumArt }), {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
@@ -116,7 +161,7 @@ function ShowScore(props){
       <div className='result'>
         <div className='wrapper'>
           <img className='mbti_img' src={`img/${sortedlist[0][0]}.png`}></img>
-          <h3>  {sortedlist[0][0]}</h3>
+          <h3> {sortedlist[0][0]}</h3>
         </div>
         
         <img className='heart' src='img/heart.png's></img>
@@ -157,6 +202,10 @@ function Search(props){
     }
   };
 
+  const handleFormSubmit = (e) => {
+    e.preventDefault(); // 페이지 새로고침 방지
+    handleSearch(); // 검색 함수 실행
+  };
 
   const handleChange = (event) => {
     setInputValue(event.target.value); // 입력값을 상태로 저장
@@ -172,11 +221,11 @@ function Search(props){
           <h3>MBTI별 궁합 점수를 봐드립니다.</h3>
         </div>
       </div>
-      <div class="search">
+      <form class="search" onSubmit={handleFormSubmit}>
         <input type="text" placeholder="노래 제목과 가수를 입력해주세요." value={inputValue} // input의 value를 상태와 연결
         onChange={handleChange}/>
         <img class="searchBtn" src="https://s3.ap-northeast-2.amazonaws.com/cdn.wecode.co.kr/icon/search.png" onClick={handleSearch} />
-      </div>
+      </form>
       <div className='search-result'>
         {searchResult.map((item, index) => (
           <div className="songlist" key={index} onClick={() => {
@@ -198,39 +247,6 @@ function Search(props){
 }
 
 
-function SongRecommendation(props) {
-  const [songName, setSongName] = useState('');
-  const [recommendations, setRecommendations] = useState({});
-  
-
-  const handleSongSubmit = async () => {
-    try {
-      const response = await axios.post('http://localhost:8000/recommend/', new URLSearchParams({ song_name: songName }));
-      setRecommendations(response.data);
-    } catch (error) {
-      console.error('Error downloading or processing song:', error);
-      alert('Server Error : 데이터를 불러오는데 실패했습니다.');
-    }
-  };
-
-  return (
-      <div className='main-form'>
-        <input
-          type="text"
-          placeholder="노래 이름 입력"
-          value={songName}
-          onChange={(e) => setSongName(e.target.value)}
-        />
-        <button onClick={handleSongSubmit}>노래 추천 받기</button>
-        <div>
-          {Object.entries(recommendations).sort((a, b) => b[1] - a[1]).map(([mbti, score]) => (
-            <p key={mbti}>{`${mbti}: ${score.toFixed(2)}`}</p>
-          ))}
-        </div>
-      </div>
-  );
-}
-
 function MAIN(props) {
 
   return(
@@ -245,7 +261,7 @@ function MAIN(props) {
               props.setMode("SHOW_LIST");
             }}>
             <img alt='robot_img' src= "/img/robot.png" />
-            <div className='center-text'>AI 추천<br /> MBTI Playlist</div>
+            <div className='center-text'>AI 추천<br /> MBTI별 Playlist</div>
           </div>
           </div>
   )

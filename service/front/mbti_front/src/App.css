@@ -115,7 +115,7 @@
   background-image: url('../public/img/back_btn.png');
   margin-left: 510px;
   margin-top: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 0px;
   width: 30px;
   height: 46px;
   background-repeat:no-repeat;
@@ -240,6 +240,10 @@ input {
 }
 
 .songlist{
+  margin-left: 10px;
+  margin-bottom: 5px;
+  width: 540px;
+  background-color: #fafafa;
   display: flex;
   border: 2px black;
   border-radius: 10px;
@@ -251,7 +255,18 @@ input {
 }
 
 
+.score{
+  width: 60px;
+  padding-top: 15px;
+  margin-left: 60px;
+  padding-left: 15px;
+  padding-right: 15px;
+  background-color: rgb(237, 231, 113);
+  border-radius: 10px;
+}
+
 .songinfo{
+  width : 350px;
   display: flex;
   flex-direction: column;
   align-items: start;
@@ -278,6 +293,9 @@ input {
   width:100px;
   padding-right: 10px;
 }
+
+
+
 
 .row-container{
   border-radius: 10px;

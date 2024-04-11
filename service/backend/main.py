@@ -11,7 +11,7 @@ import os, sys
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import uvicorn
-from ..db.models import Base, MBTIMusic, SessionLocal, engine
+from models import Base, MBTIMusic, SessionLocal, engine
 
 #### spotify api keys
 cid = 'ecd654ce83084fad9d37d9f05bb169e8'
@@ -30,6 +30,21 @@ state_dict = torch.load('./service/backend/my_model_two.pth', map_location=torch
 model.load_state_dict(state_dict)
 model.eval()
 
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+class MusicCreate(BaseModel):
+    mbti: str
+    song_title: str
+    artist: str
+    img_src = str
+    score: int
+    
+    
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],  # 프론트엔드 서버 주소
@@ -37,22 +52,52 @@ app.add_middleware(
     allow_methods=["*"],  # 모든 HTTP 메소드 허용
     allow_headers=["*"],  # 모든 HTTP 헤더 허용
 )
-# MBTI를 기반으로 노래를 추천하는 API
-@app.post("/recommend/")
-def recommend(song_name: str = Form(...), singer: str = From(...)):
-    query = song_name + "_" + singer
-    get_song = download_song(query)
-    if get_song == 0:
-        raise HTTPException(status_code=404, detail="Download failed")
-    
-    song_vector = preproc(query)
-    
-    with torch.no_grad():
-        output = model(song_vector.unsqueeze(0)).squeeze()
-        
-    output_list = output.tolist()
-    scores_dict = {mbti: score for mbti, score in zip(mbti_types, output_list)}
 
+def save_recommendation_to_db(mbti_scores: dict, song_name: str, singer: str, img_src: str, db: Session):
+    # MBTI 점수를 데이터베이스에 저장
+    for mbti, score in mbti_scores.items():
+        # 동일한 노래에 대한 기존 데이터가 있는지 확인
+        db_song = db.query(MBTIMusic).filter(MBTIMusic.song_title == song_name, MBTIMusic.artist == singer, MBTIMusic.mbti == mbti).first()
+        if db_song:
+            # 기존 데이터가 있다면 점수 업데이트
+            db_song.score = score
+        else:
+            # 새로운 레코드 생성
+            new_song = MBTIMusic(mbti=mbti, song_title=song_name, artist=singer, score=score, img_src=img_src)
+            db.add(new_song)
+    db.commit()
+
+
+# mbti 들어왔을 때 점수 높은 노래들 반환
+@app.get("/songs/{mbti}")
+def read_top_songs(mbti: str, db: Session = Depends(get_db)):
+    top_songs = db.query(MBTIMusic).filter(MBTIMusic.mbti == mbti).order_by(MBTIMusic.score.desc()).limit(20).all()
+    return top_songs
+
+
+#노래들어왔을때, 기반으로 BEST MBTI를 추천
+@app.post("/recommend/")
+def recommend(song_name: str = Form(...), singer: str = Form(...), img_src : str = Form(...), db: Session = Depends(get_db)):
+    existing_songs = db.query(MBTIMusic).filter(MBTIMusic.song_title == song_name, MBTIMusic.artist == singer).all()
+    
+    if(existing_songs):
+        return {song.mbti: song.score for song in existing_songs}
+        
+    else:
+        query = song_name + "_" + singer
+        get_song = download_song(query)
+        if get_song == 0:
+            raise HTTPException(status_code=404, detail="Download failed")
+        
+        song_vector = preproc(query)
+        
+        with torch.no_grad():
+            output = model(song_vector.unsqueeze(0)).squeeze()
+            
+        output_list = output.tolist()
+        scores_dict = {mbti: score for mbti, score in zip(mbti_types, output_list)}
+        save_recommendation_to_db(scores_dict, song_name, singer, img_src, db)
+        
     return scores_dict
 
 
@@ -73,6 +118,6 @@ if __name__ == "__main__":
     uvicorn.run(
         "main:app",
         host="127.0.0.1",
-        reload=True,
+        reload=False,
         port=8000
     )
