@@ -10,7 +10,7 @@ Problem. 기존 음악 추천 시스템의 한계
 
 Solution. 음악 자체 분석 + MBTI로 개인 특성 적극반영
 
-- 1.음악의 파형에서 추출한 MFCC 계수를 학습에 이용 -> 음악 Raw Data에서 다양한 특성 활용 가능
+- 1. 음악의 파형에서 추출한 MFCC 계수를 학습에 이용 -> 음악 Raw Data에서 다양한 특성 활용 가능
 - 2. Spotify의 MBTI 관련 플레이리스트에서, 선호 음악 데이터 추출 -> 성격, 기질 특성 반영
 - 3. Transformer로 MFCC에서 feature 추출 후, MBTI별(16개) Decoder를 활용해 각각의 추천 점수 반환.
 
